@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:title="BtEnable"
+        android:icon="@drawable/baseline_bluetooth_enable_24"
+        android:id="@+id/id_bt_button"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="100"
+        />
+    <item android:title="BtMenu"
+        android:icon="@drawable/menu"
+        android:id="@+id/id_bt_menu"
+        app:showAsAction="ifRoom"
+        android:orderInCategory="200"
+        />
+</menu>

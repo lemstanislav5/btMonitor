@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">btMonitor</string>
+    <string name="title_name">Найденные устройства</string>
+    <string name="discovering">Поиск…</string>
+</resources>
