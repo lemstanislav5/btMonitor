@@ -4,12 +4,18 @@
         android:icon="@drawable/baseline_bluetooth_enable_24"
         android:id="@+id/id_bt_button"
         app:showAsAction="ifRoom"
+        android:orderInCategory="200"
+        />
+    <item android:title="BtEnable"
+        android:icon="@drawable/ic_connection"
+        android:id="@+id/id_connect"
+        app:showAsAction="ifRoom"
         android:orderInCategory="100"
         />
     <item android:title="BtMenu"
         android:icon="@drawable/menu"
         android:id="@+id/id_bt_menu"
         app:showAsAction="ifRoom"
-        android:orderInCategory="200"
+        android:orderInCategory="300"
         />
 </menu>

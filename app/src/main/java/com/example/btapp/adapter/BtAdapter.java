@@ -21,6 +21,7 @@ public class BtAdapter extends ArrayAdapter<ListItem> {
     public static final String DISCOVERI_ITEM_TYPE = "discoveri";
     private List<ListItem> mainList;
     private List<ViewHolder> listViewHolders;
+    private boolean isDiscoveryTupe = false;
 
     private SharedPreferences pref;
     public BtAdapter(@NonNull Context context, int resource, List<ListItem> btList) {
@@ -67,23 +68,29 @@ public class BtAdapter extends ArrayAdapter<ListItem> {
             convertView.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
+            viewHolder.chBtSelect.setChecked(false);
+        }
+        if(mainList.get(position).getItemType().equals(BtAdapter.DISCOVERI_ITEM_TYPE)){
+            viewHolder.chBtSelect.setVisibility(View.GONE);
+            isDiscoveryTupe = true;
+        } else {
+            viewHolder.chBtSelect.setVisibility(View.VISIBLE);
+            isDiscoveryTupe = false;
         }
         viewHolder.tvBtName.setText(mainList.get(position).getBtDevice().getName());
         viewHolder.tvMac.setText((mainList).get(position).getBtDevice().getAddress());
-        viewHolder.chBtSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                for(ViewHolder holder : listViewHolders){
-                    holder.chBtSelect.setChecked(false);
-                }
-                viewHolder.chBtSelect.setChecked(true);
-                savePref(position);
+        viewHolder.chBtSelect.setOnClickListener(view -> {
+            for(ViewHolder holder : listViewHolders){
+                holder.chBtSelect.setChecked(false);
             }
+            viewHolder.chBtSelect.setChecked(true);
+            savePref(position);
         });
         // Сравнение сохраненного mac-адресса и того, что был нажат
         if(pref.getString(BtConsts.MAC_KEY, "no bt selected").equals(mainList.get(position).getBtDevice().getAddress())){
             viewHolder.chBtSelect.setChecked(true);
         }
+        isDiscoveryTupe =false;
         return convertView;
     }
     private View titleItem(View convertView, ViewGroup parent){

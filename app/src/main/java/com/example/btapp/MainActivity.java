@@ -24,6 +24,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.btapp.adapter.BtConsts;
+import com.example.btapp.bluetooth.BtConnection;
 
 public class MainActivity extends AppCompatActivity {
     private MenuItem menuItem;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private final int ENABLE_REQUEST = 15;
     private SharedPreferences pref;
     private final  int BT_REQUEST_PERM = 111;
+    private BtConnection btConnection;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private void init(){
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         pref = getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
+        btConnection = new BtConnection(this);
         Log.d("MyLog", "Bt MAC " + pref.getString(BtConsts.MAC_KEY, "no bt selected"));
     }
 
@@ -117,6 +120,8 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Bluetooth выключен", Toast.LENGTH_SHORT).show();
             }
 
+        }else if(item.getItemId() == R.id.id_connect){
+            btConnection.connect();
         }
         return super.onOptionsItemSelected(item);
     }

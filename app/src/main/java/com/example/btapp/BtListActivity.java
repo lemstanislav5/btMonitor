@@ -128,7 +128,7 @@ public class BtListActivity extends AppCompatActivity {
                     Toast.makeText(BtListActivity.this, "Соединение с устройством работает!", Toast.LENGTH_SHORT).show();
                     item.getBtDevice().createBond();
                 } else {
-                    Toast.makeText(BtListActivity.this, "Соединение с устройством неработает!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BtListActivity.this, "Соединение с устройством не работает!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -169,6 +169,11 @@ public class BtListActivity extends AppCompatActivity {
                 isDiscovery = false;
                 getPairedDevices();
                 Toast.makeText(context, "Поиск устройств закончен!", Toast.LENGTH_SHORT).show();
+            } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction())) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if(device.getBondState() == BluetoothDevice.BOND_BONDED){
+                    getPairedDevices();
+                }
             }
         }
     };
