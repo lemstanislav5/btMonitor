@@ -18,7 +18,12 @@ public class ReceiveThread extends Thread{
         try {
             inputStream = socket.getInputStream();
         } catch (IOException err){
-            Log.d("MyLog", "ReceiveThread: " + String.valueOf(err));
+            Log.d("MyLog", "Error getInputStream: " + String.valueOf(err));
+        }
+        try {
+            outputStream = socket.getOutputStream();
+        } catch (IOException err){
+            Log.d("MyLog", "Error getOutputStream: " + String.valueOf(err));
         }
     }
 
@@ -29,11 +34,20 @@ public class ReceiveThread extends Thread{
             try {
                 int size = inputStream.read(rBuffer);
                 String message = new String(rBuffer, 0, size);
-                Log.d("MyLog", "Message: " + String.valueOf(message));
+                // Получение сообщения
+                Log.d("MyLog", "class ReceiveThread message: " + String.valueOf(message));
             } catch (IOException err){
                 Log.d("MyLog", "run: " + String.valueOf(err));
                 break;
             }
+        }
+    }
+
+    public void sendMessage(byte[] byteArray){
+        try {
+            outputStream.write(byteArray);
+        } catch (IOException err){
+            Log.d("MyLog", "Error sendMessage: " + String.valueOf(err));
         }
     }
 }

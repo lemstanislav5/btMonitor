@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.Toast;
 // НОВОЕ ПОДКЛЮЧЕНИЕ TOOLBAR
 import androidx.annotation.NonNull;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private final  int BT_REQUEST_PERM = 111;
     private BtConnection btConnection;
+    private Button buttonA, buttonB;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +48,19 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        // ПРИ СТАРТЕ ПЕРВОГО АКТИВИТИ ЗАПРОСИМ ВСЕ НЕОБХОДИМЫЕ РАЗРЕШЕНИЯ
 
+        buttonA = findViewById(R.id.sendA);
+        buttonB = findViewById(R.id.sendB);
         init();
+        //Получаем необходимые разрешения
         getBtPermission();
+        //Отправляем сообщения на устройство
+        buttonA.setOnClickListener(view -> {
+            btConnection.sendMessage("A");
+        });
+        buttonB.setOnClickListener(view -> {
+            btConnection.sendMessage("B");
+        });
     }
     @SuppressLint("InlinedApi")
     private void getBtPermission(){
@@ -122,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
 
         }else if(item.getItemId() == R.id.id_connect){
             btConnection.connect();
+            Toast.makeText(this, "Подключаемся к устройству", Toast.LENGTH_SHORT).show();
         }
         return super.onOptionsItemSelected(item);
     }

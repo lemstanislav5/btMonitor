@@ -15,7 +15,20 @@
           tools:layout_editor_absoluteX="1dp"
           tools:layout_editor_absoluteY="1dp"
           tools:ignore="MissingConstraints"
+          android:layout_marginHorizontal="30dp"
+          android:layout_marginTop="20dp"
           android:background="@color/white">
 
+            <Button
+                android:id="@+id/sendA"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send A" />
+
+            <Button
+                android:id="@+id/sendB"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Send B" />
       </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
