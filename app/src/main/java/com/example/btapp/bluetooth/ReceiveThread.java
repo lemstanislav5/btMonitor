@@ -8,13 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class ReceiveThread extends Thread{
-    private BluetoothSocket socket;
     private InputStream inputStream;
     private OutputStream outputStream;
-    private byte[] rBuffer;
 
     public ReceiveThread(BluetoothSocket socket){
-        this.socket = socket;
         try {
             inputStream = socket.getInputStream();
         } catch (IOException err){
@@ -30,7 +27,7 @@ public class ReceiveThread extends Thread{
     @Override
     public void run() {
         Log.d("MyLog", "class ReceiveThread run()");
-        rBuffer = new byte[40];
+        byte[] rBuffer = new byte[40];
         int size;
         String key = "";
         while (true){

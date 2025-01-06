@@ -9,9 +9,8 @@ import android.widget.Toast;
 import com.example.btapp.adapter.BtConsts;
 
 public class BtConnection {
-    private SharedPreferences pref;
-    private BluetoothAdapter btAdapter;
-    private BluetoothDevice device;
+    private final SharedPreferences pref;
+    private final BluetoothAdapter btAdapter;
     private ConnectThread connectThread;
     public BtConnection(Context context) {
         pref = context.getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
@@ -22,7 +21,7 @@ public class BtConnection {
         String mac = pref.getString(BtConsts.MAC_KEY, "");
         if(!btAdapter.isEnabled() || mac.isEmpty()) return;
         Log.d("MyLog", "connect() мас: " + mac);
-        device = btAdapter.getRemoteDevice(mac);
+        BluetoothDevice device = btAdapter.getRemoteDevice(mac);
         if(device == null) return;
         connectThread = new ConnectThread(btAdapter, device);
         connectThread.start();
