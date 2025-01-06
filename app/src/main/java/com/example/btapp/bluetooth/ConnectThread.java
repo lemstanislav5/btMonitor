@@ -13,7 +13,7 @@ import com.example.btapp.MainActivity;
 import java.io.IOException;
 
 public class ConnectThread extends Thread{
-    private BluetoothAdapter btAdapter;
+    private final BluetoothAdapter btAdapter;
     private BluetoothSocket mSocket;
     private ReceiveThread receiveThread;
     public static final String UUID = "00001101-0000-1000-8000-00805F9B34FB";
@@ -35,7 +35,6 @@ public class ConnectThread extends Thread{
             mSocket.connect();
             receiveThread = new ReceiveThread(mSocket);
             receiveThread.start();
-            new ReceiveThread(mSocket).start();
             Log.d("MyLog", "Connected");
         } catch (IOException err){
             Log.d("MyLog", String.valueOf(err));

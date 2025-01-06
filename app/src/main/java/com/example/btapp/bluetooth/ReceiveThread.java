@@ -29,13 +29,22 @@ public class ReceiveThread extends Thread{
 
     @Override
     public void run() {
-        rBuffer = new byte[20];
+        Log.d("MyLog", "class ReceiveThread run()");
+        rBuffer = new byte[40];
+        int size;
+        String key = "";
         while (true){
             try {
-                int size = inputStream.read(rBuffer);
-                String message = new String(rBuffer, 0, size);
-                // Получение сообщения
-                Log.d("MyLog", "class ReceiveThread message: " + String.valueOf(message));
+                size = inputStream.read(rBuffer);
+                String newKey = new String(rBuffer, 0, size);
+                boolean hookStart = newKey.contains("[");
+                boolean hookEnd = newKey.contains("]");
+                if(hookStart && hookEnd){
+                    if(!key.equals(newKey)){
+                        key = newKey;
+                        Log.d("MyLog", "class ReceiveThread key: " + key);
+                    }
+                }
             } catch (IOException err){
                 Log.d("MyLog", "run: " + String.valueOf(err));
                 break;
