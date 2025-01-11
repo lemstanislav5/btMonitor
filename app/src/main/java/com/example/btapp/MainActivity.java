@@ -75,37 +75,24 @@ public class MainActivity extends AppCompatActivity {
         myBroadcastReceiver = new BroadcastReceiver(){
             @Override
             public void onReceive(Context context, Intent intent) {
-                Log.d("MyLog", "ПРИШЛО УВЕДОМЛЕНИЕ MY_ACTION !!!");
                 if (Objects.equals(intent.getAction(), "MY_ACTION")) {
                     String data = intent.getStringExtra("com.example.snippets.DATA");
                     Log.d("MyLog", "данные: " + data);
-
+                    //----------------------------------------------------------- база данных ----------------------------------------------------------
                     // Создаем экземпляр базы данных
                     databaseHelper = new DatabaseHelper(getApplicationContext());
                     if(databaseHelper.InsertKeyString(data)){
-                        Toast.makeText(getApplicationContext(),"Record inserted successfully",Toast.LENGTH_LONG).show();
                         db = databaseHelper.getReadableDatabase();
                         //получаем данные из бд в виде курсора
                         keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
                         // определяем, какие столбцы из курсора будут выводиться в ListView
                         String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
-                        Log.d("MyLog", Arrays.toString(headers));
-
-//                        String[] countries = { "Бразилия", "Аргентина", "Колумбия", "Чили", "Уругвай"};
-//                        ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, countries);
-//                        keysListView.setAdapter(adapter);
-
-
                         keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
                                 keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
                         keysListView.setAdapter(keysAdapter);
-
-                        // создаем адаптер, передаем в него курсор
-//                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
-//                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
-//                        keysListView.setAdapter(keysAdapter);
+                        //----------------------------------------------------------- база данных ----------------------------------------------------------
                     } else {
-                        Toast.makeText(getApplicationContext(),"Record not inserted",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Ошибка записи базы данных!",Toast.LENGTH_LONG).show();
                     }
 
                 }
@@ -115,14 +102,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonA = findViewById(R.id.sendA);
         buttonB = findViewById(R.id.sendB);
-//        остановился здесь
         keysListView = findViewById(R.id.listKeys);
-        //-----------------------------------------------------------
-//        String[] countries = { "Бразилия", "Аргентина", "Колумбия", "Чили", "Уругвай"};
-//        ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, countries);
-//        keysListView.setAdapter(adapter);
-//        adapter = new BtAdapter(this, R.layout.bt_list_item, list);
-//        listView.setAdapter(adapter);
 
         init();
         //Получаем необходимые разрешения
@@ -139,8 +119,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        //----------------------------------------------------------- база данных ----------------------------------------------------------
+        databaseHelper = new DatabaseHelper(getApplicationContext());
+        db = databaseHelper.getReadableDatabase();
+        keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
+        String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
+        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+        keysListView.setAdapter(keysAdapter);
+        //----------------------------------------------------------- база данных ----------------------------------------------------------
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        db.close();
+        keysCursor.close();
         unregisterReceiver(myBroadcastReceiver);
     }
 

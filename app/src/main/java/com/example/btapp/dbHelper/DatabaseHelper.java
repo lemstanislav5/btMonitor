@@ -8,7 +8,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final int version = 1;
     public  static String dbName="db.db";
     public static final String TABLE_NAME ="keys";
-    public static final String COL1 = "id";
+    public static final String COL1 = "_id";
     public static final String COL2 = "keyString";
     public static final String COL3 = "address";
     private static final String CREATE_TABLE = "create table if not exists "+ TABLE_NAME + "(" + COL1 + " INTEGER PRIMARY KEY AUTOINCREMENT,"+COL2+" TEXT NOT NULL," + COL3 + " TEXT);";
