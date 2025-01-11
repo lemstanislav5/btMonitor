@@ -65,7 +65,6 @@ public class ReceiveThread extends Thread{
                         intent.setPackage("com.example.btapp");
                         intent.setAction("MY_ACTION");
                         context.sendBroadcast(intent);
-
                     }
                 }
             } catch (IOException err){

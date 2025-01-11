@@ -8,19 +8,21 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-// НОВОЕ ПОДКЛЮЧЕНИЕ TOOLBAR
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.Toolbar;
+import android.widget.SimpleCursorAdapter;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -29,8 +31,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.btapp.adapter.BtAdapter;
 import com.example.btapp.adapter.BtConsts;
 import com.example.btapp.bluetooth.BtConnection;
+import com.example.btapp.dbHelper.DatabaseHelper;
 
 import java.util.Objects;
 
@@ -43,8 +47,11 @@ public class MainActivity extends AppCompatActivity {
     private BtConnection btConnection;
     private Button buttonA, buttonB;
     private BroadcastReceiver myBroadcastReceiver;
-
-    private TextView newKey;
+    DatabaseHelper databaseHelper;
+    SQLiteDatabase db;
+    Cursor keysCursor;
+    SimpleCursorAdapter keysAdapter;
+    private ListView listView;
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
@@ -70,7 +77,25 @@ public class MainActivity extends AppCompatActivity {
                 if (Objects.equals(intent.getAction(), "MY_ACTION")) {
                     String data = intent.getStringExtra("com.example.snippets.DATA");
                     Log.d("MyLog", "данные: " + data);
-                    newKey.setText(data);
+
+                    // Создаем экземпляр базы данных
+                    databaseHelper = new DatabaseHelper(getApplicationContext());
+                    if(databaseHelper.InsertKeyString(data)){
+                        Toast.makeText(getApplicationContext(),"Record inserted successfully",Toast.LENGTH_LONG).show();
+                        db = databaseHelper.getReadableDatabase();
+                        //получаем данные из бд в виде курсора
+                        keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
+                        // определяем, какие столбцы из курсора будут выводиться в ListView
+                        String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
+                        // создаем адаптер, передаем в него курсор
+//                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+//                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+//                        header.setText("Найдено элементов: " +  keysCursor.getCount());
+//                    userList.setAdapter(userAdapter);
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Record not inserted",Toast.LENGTH_LONG).show();
+                    }
+
                 }
             }
         };
@@ -78,7 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
         buttonA = findViewById(R.id.sendA);
         buttonB = findViewById(R.id.sendB);
-        newKey = findViewById(R.id.newKey);
+//        остановился здесь
+//        listView = findViewById(R.id.listViewKeys);
+//        adapter = new BtAdapter(this, R.layout.bt_list_item, list);
+//        listView.setAdapter(adapter);
 
         init();
         //Получаем необходимые разрешения
