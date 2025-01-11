@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -36,6 +37,7 @@ import com.example.btapp.adapter.BtConsts;
 import com.example.btapp.bluetooth.BtConnection;
 import com.example.btapp.dbHelper.DatabaseHelper;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase db;
     Cursor keysCursor;
     SimpleCursorAdapter keysAdapter;
-    private ListView listView;
+    private ListView keysListView;
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
@@ -87,11 +89,21 @@ public class MainActivity extends AppCompatActivity {
                         keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
                         // определяем, какие столбцы из курсора будут выводиться в ListView
                         String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
+                        Log.d("MyLog", Arrays.toString(headers));
+
+//                        String[] countries = { "Бразилия", "Аргентина", "Колумбия", "Чили", "Уругвай"};
+//                        ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, countries);
+//                        keysListView.setAdapter(adapter);
+
+
+                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+                        keysListView.setAdapter(keysAdapter);
+
                         // создаем адаптер, передаем в него курсор
 //                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
 //                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
-//                        header.setText("Найдено элементов: " +  keysCursor.getCount());
-//                    userList.setAdapter(userAdapter);
+//                        keysListView.setAdapter(keysAdapter);
                     } else {
                         Toast.makeText(getApplicationContext(),"Record not inserted",Toast.LENGTH_LONG).show();
                     }
@@ -104,7 +116,11 @@ public class MainActivity extends AppCompatActivity {
         buttonA = findViewById(R.id.sendA);
         buttonB = findViewById(R.id.sendB);
 //        остановился здесь
-//        listView = findViewById(R.id.listViewKeys);
+        keysListView = findViewById(R.id.listKeys);
+        //-----------------------------------------------------------
+//        String[] countries = { "Бразилия", "Аргентина", "Колумбия", "Чили", "Уругвай"};
+//        ArrayAdapter<String> adapter = new ArrayAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, countries);
+//        keysListView.setAdapter(adapter);
 //        adapter = new BtAdapter(this, R.layout.bt_list_item, list);
 //        listView.setAdapter(adapter);
 
