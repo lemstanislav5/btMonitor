@@ -18,7 +18,17 @@
           android:layout_marginHorizontal="30dp"
           android:layout_marginTop="20dp"
           android:background="@color/white">
-
+            <TextView
+                android:id="@+id/newKey"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="10sp"
+                android:textSize="20sp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:textColor="#333"
+                android:background="#64C171"/>
             <Button
                 android:id="@+id/sendA"
                 android:layout_width="match_parent"
@@ -30,5 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Send B" />
+
+
       </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

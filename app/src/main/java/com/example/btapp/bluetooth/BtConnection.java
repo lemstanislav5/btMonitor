@@ -3,6 +3,7 @@ package com.example.btapp.bluetooth;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.Toast;
@@ -12,9 +13,11 @@ public class BtConnection {
     private final SharedPreferences pref;
     private final BluetoothAdapter btAdapter;
     private ConnectThread connectThread;
+    Context context;
     public BtConnection(Context context) {
-        pref = context.getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
-        btAdapter = BluetoothAdapter.getDefaultAdapter();
+        this.context = context;
+        this.pref = context.getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
+        this.btAdapter = BluetoothAdapter.getDefaultAdapter();
     }
 
     public void connect(){
@@ -23,7 +26,7 @@ public class BtConnection {
         Log.d("MyLog", "connect() мас: " + mac);
         BluetoothDevice device = btAdapter.getRemoteDevice(mac);
         if(device == null) return;
-        connectThread = new ConnectThread(btAdapter, device);
+        connectThread = new ConnectThread(btAdapter, device, context);
         connectThread.start();
     }
 

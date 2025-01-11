@@ -171,6 +171,7 @@ public class BtListActivity extends AppCompatActivity {
                 Toast.makeText(context, "Поиск устройств закончен!", Toast.LENGTH_SHORT).show();
             } else if (BluetoothDevice.ACTION_BOND_STATE_CHANGED.equals(intent.getAction())) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                assert device != null;
                 if(device.getBondState() == BluetoothDevice.BOND_BONDED){
                     getPairedDevices();
                 }

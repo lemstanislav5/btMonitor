@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -17,14 +18,17 @@ public class ConnectThread extends Thread{
     private BluetoothSocket mSocket;
     private ReceiveThread receiveThread;
     public static final String UUID = "00001101-0000-1000-8000-00805F9B34FB";
+
+    Context context;
     @SuppressLint("MissingPermission")
-    public ConnectThread(BluetoothAdapter btAdapter, BluetoothDevice device){
+    public ConnectThread(BluetoothAdapter btAdapter, BluetoothDevice device, Context context){
         this.btAdapter = btAdapter;
         try {
-            mSocket = device.createRfcommSocketToServiceRecord(java.util.UUID.fromString(UUID));
+            this.mSocket = device.createRfcommSocketToServiceRecord(java.util.UUID.fromString(UUID));
         } catch (IOException e){
             Log.d("MyLog", "Not mSocket");
         }
+        this.context = context;
     }
 
     @SuppressLint("MissingPermission")
@@ -33,7 +37,7 @@ public class ConnectThread extends Thread{
         btAdapter.cancelDiscovery();
         try {
             mSocket.connect();
-            receiveThread = new ReceiveThread(mSocket);
+            receiveThread = new ReceiveThread(mSocket, context);
             receiveThread.start();
             Log.d("MyLog", "Connected");
         } catch (IOException err){

@@ -2,19 +2,24 @@ package com.example.btapp;
 
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 // НОВОЕ ПОДКЛЮЧЕНИЕ TOOLBAR
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,6 +32,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.btapp.adapter.BtConsts;
 import com.example.btapp.bluetooth.BtConnection;
 
+import java.util.Objects;
+
 public class MainActivity extends AppCompatActivity {
     private MenuItem menuItem;
     private BluetoothAdapter btAdapter;
@@ -35,7 +42,11 @@ public class MainActivity extends AppCompatActivity {
     private final  int BT_REQUEST_PERM = 111;
     private BtConnection btConnection;
     private Button buttonA, buttonB;
+    private BroadcastReceiver myBroadcastReceiver;
 
+    private TextView newKey;
+
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,31 +60,58 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
+        // Создаем приемник и его фильтры
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("MY_ACTION");
+        myBroadcastReceiver = new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Log.d("MyLog", "ПРИШЛО УВЕДОМЛЕНИЕ MY_ACTION !!!");
+                if (Objects.equals(intent.getAction(), "MY_ACTION")) {
+                    String data = intent.getStringExtra("com.example.snippets.DATA");
+                    Log.d("MyLog", "данные: " + data);
+                    newKey.setText(data);
+                }
+            }
+        };
+        registerReceiver(myBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+
         buttonA = findViewById(R.id.sendA);
         buttonB = findViewById(R.id.sendB);
+        newKey = findViewById(R.id.newKey);
+
         init();
         //Получаем необходимые разрешения
         getBtPermission();
         //Отправляем сообщения на устройство
         buttonA.setOnClickListener(view -> {
             btConnection.sendMessage("A");
+//            String mac = pref.getString(BtConsts.MAC_KEY, "");
+//            Log.d("MyLog", "Выбрано устройство: " + mac);
         });
         buttonB.setOnClickListener(view -> {
             btConnection.sendMessage("B");
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(myBroadcastReceiver);
+    }
+
     @SuppressLint("InlinedApi")
     private void getBtPermission(){
         if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
-                ActivityCompat.requestPermissions(this, new String[]{
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.BLUETOOTH_CONNECT,
-                        android.Manifest.permission.BLUETOOTH_ADVERTISE,
-                        android.Manifest.permission.BLUETOOTH_SCAN
-                }, BT_REQUEST_PERM);
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.BLUETOOTH_CONNECT,
+                    android.Manifest.permission.BLUETOOTH_ADVERTISE,
+                    android.Manifest.permission.BLUETOOTH_SCAN
+            }, BT_REQUEST_PERM);
         }
     }
     @Override
