@@ -19,14 +19,14 @@ public class BtAdapter extends ArrayAdapter<ListItem> {
     public static final String DEF_ITEM_TYPE = "normal";
     public static final String TITLE_ITEM_TYPE = "title";
     public static final String DISCOVERI_ITEM_TYPE = "discoveri";
-    private List<ListItem> mainList;
-    private List<ViewHolder> listViewHolders;
-    private SharedPreferences pref;
+    private final List<ListItem> mainList;
+    private final List<ViewHolder> listViewHolders;
+    private final SharedPreferences pref;
     public BtAdapter(@NonNull Context context, int resource, List<ListItem> btList) {
         super(context, resource, btList);
-        mainList = btList;
-        listViewHolders = new ArrayList<>();
-        pref = context.getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
+        this.mainList = btList;
+        this.listViewHolders = new ArrayList<>();
+        this.pref = context.getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
     }
 
     @NonNull

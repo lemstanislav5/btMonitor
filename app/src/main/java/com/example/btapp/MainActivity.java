@@ -15,10 +15,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,12 +32,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.btapp.adapter.BtAdapter;
 import com.example.btapp.adapter.BtConsts;
 import com.example.btapp.bluetooth.BtConnection;
 import com.example.btapp.dbHelper.DatabaseHelper;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -86,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         //получаем данные из бд в виде курсора
                         keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
                         // определяем, какие столбцы из курсора будут выводиться в ListView
-                        String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
+                        String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
                         keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
                                 keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
                         keysListView.setAdapter(keysAdapter);
@@ -103,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         buttonA = findViewById(R.id.sendA);
         buttonB = findViewById(R.id.sendB);
         keysListView = findViewById(R.id.listKeys);
+
 
         init();
         //Получаем необходимые разрешения
@@ -125,10 +124,17 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(getApplicationContext());
         db = databaseHelper.getReadableDatabase();
         keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
-        String[] headers = new String[] {DatabaseHelper.COL1, DatabaseHelper.COL2, DatabaseHelper.COL3};
+        String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
         keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
                 keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
         keysListView.setAdapter(keysAdapter);
+
+        keysListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d("MyLog", "itemClick: position = " + i + ", id = "  + l);
+            }
+        });
         //----------------------------------------------------------- база данных ----------------------------------------------------------
     }
 
