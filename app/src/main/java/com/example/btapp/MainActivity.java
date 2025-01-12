@@ -133,6 +133,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d("MyLog", "itemClick: position = " + i + ", id = "  + l);
+                String key = keysCursor.getString(1);
+                Log.d("MyLog", "key = " + key);
+                /**
+                 * Остановился здесь
+                 * После выбора id мы активизируем кнопки удалить, отправить, редактировать
+                 * и поле редактирования адреса метки
+                 * далее прописываем соответствующую логику
+                */
             }
         });
         //----------------------------------------------------------- база данных ----------------------------------------------------------
