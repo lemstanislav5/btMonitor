@@ -26,29 +26,42 @@
                 tools:layout_editor_absoluteX="1dp"
                 tools:layout_editor_absoluteY="1dp"
                 />
-            <TextView
-                android:id="@+id/newKey"
+
+            <EditText
+                android:id="@+id/editText1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:ems="10"
+                android:hint="Адрес ключа"
                 android:gravity="center"
-                android:padding="10sp"
-                android:textSize="20sp"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="20dp"
-                android:textColor="#000000"
-                android:background="#64C171"/>
+                android:focusable="false"/>
             <Button
-                android:id="@+id/sendA"
+                android:id="@+id/update"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Send A" />
-
+                android:backgroundTint="#4CAF50"
+                android:text="Сохранить"
+                android:textColor="#fff"
+                android:textSize="24sp"
+                android:textStyle="bold" />
             <Button
-                android:id="@+id/sendB"
+                android:id="@+id/send"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Send B" />
-
+                android:backgroundTint="#2196F3"
+                android:text="Отправить"
+                android:textColor="#fff"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/del"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#E91E63"
+                android:textColor="#fff"
+                android:textSize="24sp"
+                android:src="@drawable/baseline_delete_outline_24"/>
 
       </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

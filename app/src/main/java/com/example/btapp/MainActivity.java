@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -45,7 +46,8 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private final  int BT_REQUEST_PERM = 111;
     private BtConnection btConnection;
-    private Button buttonA, buttonB;
+    private Button send, update;
+    private ImageButton delete;
     private BroadcastReceiver myBroadcastReceiver;
     DatabaseHelper databaseHelper;
     SQLiteDatabase db;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     SimpleCursorAdapter keysAdapter;
     private ListView keysListView;
 
+    @SuppressLint("WrongViewCast")
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,23 +101,30 @@ public class MainActivity extends AppCompatActivity {
         };
         registerReceiver(myBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
 
-        buttonA = findViewById(R.id.sendA);
-        buttonB = findViewById(R.id.sendB);
+        update = findViewById(R.id.update);
+        send = findViewById(R.id.send);
+        delete = findViewById(R.id.del);
+
         keysListView = findViewById(R.id.listKeys);
 
 
         init();
         //Получаем необходимые разрешения
         getBtPermission();
+
+        update.setOnClickListener(view -> {
+            Toast.makeText(getApplicationContext(),"Обновление данных!",Toast.LENGTH_SHORT).show();
+        });
         //Отправляем сообщения на устройство
-        buttonA.setOnClickListener(view -> {
-            btConnection.sendMessage("A");
-//            String mac = pref.getString(BtConsts.MAC_KEY, "");
-//            Log.d("MyLog", "Выбрано устройство: " + mac);
+        send.setOnClickListener(view -> {
+//            btConnection.sendMessage("A");
+            Toast.makeText(getApplicationContext(),"Отправка данных!",Toast.LENGTH_SHORT).show();
         });
-        buttonB.setOnClickListener(view -> {
-            btConnection.sendMessage("B");
+        delete.setOnClickListener(view -> {
+//            btConnection.sendMessage("A");
+            Toast.makeText(getApplicationContext(),"Ключь удален!",Toast.LENGTH_SHORT).show();
         });
+
     }
 
     @Override
