@@ -9,6 +9,8 @@ import android.util.Log;
 import android.widget.Toast;
 import com.example.btapp.adapter.BtConsts;
 
+import java.io.IOException;
+
 public class BtConnection {
     private final SharedPreferences pref;
     private final BluetoothAdapter btAdapter;
@@ -22,8 +24,12 @@ public class BtConnection {
 
     public void connect(){
         String mac = pref.getString(BtConsts.MAC_KEY, "");
-        if(!btAdapter.isEnabled() || mac.isEmpty()) return;
+        if(!btAdapter.isEnabled() || mac.isEmpty()) {
+            Log.d("MyLog", "error connection");
+            return;
+        };
         Log.d("MyLog", "connect() мас: " + mac);
+
         BluetoothDevice device = btAdapter.getRemoteDevice(mac);
         if(device == null) return;
         connectThread = new ConnectThread(btAdapter, device, context);

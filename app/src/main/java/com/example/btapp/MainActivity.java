@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
         });
         //Отправляем сообщения на устройство
         send.setOnClickListener(view -> {
-//            btConnection.sendMessage("A");
+            btConnection.sendMessage("A");
             Toast.makeText(getApplicationContext(),"Отправка данных!",Toast.LENGTH_SHORT).show();
         });
         delete.setOnClickListener(view -> {
