@@ -41,6 +41,7 @@ public class ReceiveThread extends Thread{
             try {
                 size = inputStream.read(rBuffer);
                 String newKey = new String(rBuffer, 0, size);
+                // Входящее сообщение должно соответствовать формату [1,d3,c8,a7,1,0,0,38]
                 boolean hookStart = newKey.contains("[");
                 boolean hookEnd = newKey.contains("]");
                 if(hookStart && hookEnd){
@@ -55,8 +56,13 @@ public class ReceiveThread extends Thread{
                         // Приводим массив к строке с данными HEX
                         StringBuilder keyToHex = new StringBuilder();
                         int[] array = gson.fromJson(key, int[].class);
-                        for (int i = 0; i < array. length; i++){
-                            keyToHex.append(Integer.toHexString(array[i])).append(":");
+                        for (int i = 0; i < array.length; i++){
+                            if(i < array.length - 1){
+                                keyToHex.append(Integer.toHexString(array[i])).append(":");
+                            } else {
+                                keyToHex.append(Integer.toHexString(array[i]));
+                            }
+
                         }
 
                         // Отправляем строку в приемник
@@ -66,6 +72,8 @@ public class ReceiveThread extends Thread{
                         intent.setAction("MY_ACTION");
                         context.sendBroadcast(intent);
                     }
+                } else {
+                    Log.d("MyLog", "Сотрока не соответствует критериям!");
                 }
             } catch (IOException err){
                 Log.d("MyLog", "run: " + String.valueOf(err));

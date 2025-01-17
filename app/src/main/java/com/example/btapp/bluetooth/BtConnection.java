@@ -28,7 +28,7 @@ public class BtConnection {
             Log.d("MyLog", "error connection");
             return;
         };
-        Log.d("MyLog", "connect() мас: " + mac);
+        Log.d("MyLog", "connect to мас: " + mac);
 
         BluetoothDevice device = btAdapter.getRemoteDevice(mac);
         if(device == null) return;
