@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
     Cursor keysCursor;
     SimpleCursorAdapter keysAdapter;
     private ListView keysListView;
+    private String selectedKey;
+    private TextView selectedKeyTextView;
+
+    Cursor selectedKeyCursor;
 
     @SuppressLint("WrongViewCast")
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -104,8 +109,8 @@ public class MainActivity extends AppCompatActivity {
         update = findViewById(R.id.update);
         send = findViewById(R.id.send);
         delete = findViewById(R.id.del);
-
         keysListView = findViewById(R.id.listKeys);
+        selectedKeyTextView = findViewById(R.id.selectedKey);
 
 
         init();
@@ -140,17 +145,47 @@ public class MainActivity extends AppCompatActivity {
         keysListView.setAdapter(keysAdapter);
 
         keysListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("Range")
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.d("MyLog", "itemClick: position = " + i + ", id = "  + l);
                 String key = keysCursor.getString(1);
+                selectedKey = key;
+                selectedKeyTextView.setText(selectedKey);
+
+                databaseHelper = new DatabaseHelper(getApplicationContext());
+                db = databaseHelper.getReadableDatabase();
+                selectedKeyCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME + " where " + DatabaseHelper.COLUMN_KEY_STRING + "=?", new String [] {selectedKey});
+                if (selectedKeyCursor != null) {
+                    if (selectedKeyCursor.moveToFirst()) {
+                        String str;
+                        do {
+                            str = "";
+                            for (String cn : selectedKeyCursor.getColumnNames()) {
+                                str = str.concat(cn + " = " + selectedKeyCursor.getString(selectedKeyCursor.getColumnIndex(cn)) + "; ");
+                                /**
+                                 * Остановился здесь
+                                 * После выбора id мы активизируем кнопки удалить, отправить, редактировать
+                                 * и поле редактирования адреса метки
+                                 * далее прописываем соответствующую логику
+                                 * ВЫВОД:
+                                 * _id = 1; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
+                                 * _id = 4; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
+                                 * _id = 7; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
+                                 * _id = 9; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
+                                 * ПРИ ВНЕСЕНИИ ДАННЫХ В БАЗУ ДАННЫХ НУЖНО РЕАЛИЗОВАТЬ ПРОВЕРКУ НА ПОВТОРЕНИЕ, ЧТО МОЖНО СДЕЛАТЬ ЕСЛИ ПРИ ВЫБЛОРКЕ КУРСОР БУДЕТ NULL
+                                 */
+                            }
+                            Log.d("MyLog", str);
+                        } while (selectedKeyCursor.moveToNext());
+                    }
+                } else{
+                    Log.d("MyLog", "Cursor is null");
+                }
+
+                // не забывайте закрыть курсор
+                selectedKeyCursor.close();
                 Log.d("MyLog", "key = " + key);
-                /**
-                 * Остановился здесь
-                 * После выбора id мы активизируем кнопки удалить, отправить, редактировать
-                 * и поле редактирования адреса метки
-                 * далее прописываем соответствующую логику
-                */
             }
         });
         //----------------------------------------------------------- база данных ----------------------------------------------------------

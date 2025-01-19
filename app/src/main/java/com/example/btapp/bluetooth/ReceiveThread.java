@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,8 +55,14 @@ public class ReceiveThread extends Thread{
                         Gson gson = builder.create();
 
                         // Приводим массив к строке с данными HEX
+                        int[] array;
                         StringBuilder keyToHex = new StringBuilder();
-                        int[] array = gson.fromJson(key, int[].class);
+                        try{
+                            array = gson.fromJson(key, int[].class);
+                        }catch(JsonSyntaxException e){
+                            Log.d("MyLog", "Сотрока не соответствует формату JSON!");
+                            return;
+                        }
                         for (int i = 0; i < array.length; i++){
                             if(i < array.length - 1){
                                 keyToHex.append(Integer.toHexString(array[i])).append(":");
