@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView selectedKeyTextView;
 
     Cursor selectedKeyCursor;
+    Cursor checkKeyCursor;
 
     @SuppressLint("WrongViewCast")
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -87,9 +88,17 @@ public class MainActivity extends AppCompatActivity {
                     //----------------------------------------------------------- база данных ----------------------------------------------------------
                     // Создаем экземпляр базы данных
                     databaseHelper = new DatabaseHelper(getApplicationContext());
+                    db = databaseHelper.getReadableDatabase();
+                    // ПРОВЕРКА НА КОЛИЧЕСТОВ ЗАПИСЕЙ ВЫДАЕТ ВСЕ ЗАПИСИ ИЗ БАЗЫ !!!!!!!!!!!!!!!!!!! ОСТАНОВИЛСЯ ЗДЕСЬ
+                    checkKeyCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME + " where " + DatabaseHelper.COLUMN_KEY_STRING + "=?", new String [] {data});
+                    int count = keysCursor.getCount();
+                    Log.d("MyLog", "количество записей: " + Integer.toString(count));
+                    checkKeyCursor.close();
+
+
                     if(databaseHelper.InsertKeyString(data)){
                         db = databaseHelper.getReadableDatabase();
-                        //получаем данные из бд в виде курсора
+                        // получаем данные из бд в виде курсора
                         keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
                         // определяем, какие столбцы из курсора будут выводиться в ListView
                         String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
