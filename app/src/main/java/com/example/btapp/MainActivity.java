@@ -89,26 +89,28 @@ public class MainActivity extends AppCompatActivity {
                     // Создаем экземпляр базы данных
                     databaseHelper = new DatabaseHelper(getApplicationContext());
                     db = databaseHelper.getReadableDatabase();
-                    // ПРОВЕРКА НА КОЛИЧЕСТОВ ЗАПИСЕЙ ВЫДАЕТ ВСЕ ЗАПИСИ ИЗ БАЗЫ !!!!!!!!!!!!!!!!!!! ОСТАНОВИЛСЯ ЗДЕСЬ
+                    // Проверяем наличие ключа в базе данных
                     checkKeyCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME + " where " + DatabaseHelper.COLUMN_KEY_STRING + "=?", new String [] {data});
-                    int count = keysCursor.getCount();
-                    Log.d("MyLog", "количество записей: " + Integer.toString(count));
+                    int count = checkKeyCursor.getCount();
+                    if(count == 0){
+                        if(databaseHelper.InsertKeyString(data)){
+                            db = databaseHelper.getReadableDatabase();
+                            // получаем данные из бд в виде курсора
+                            keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
+                            // определяем, какие столбцы из курсора будут выводиться в ListView
+                            String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
+                            keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+                                    keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+                            keysListView.setAdapter(keysAdapter);
+                            //----------------------------------------------------------- база данных ----------------------------------------------------------
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Ошибка записи базы данных!",Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        Toast.makeText(getApplicationContext(),"Ключь уже записан!",Toast.LENGTH_LONG).show();
+                    }
                     checkKeyCursor.close();
 
-
-                    if(databaseHelper.InsertKeyString(data)){
-                        db = databaseHelper.getReadableDatabase();
-                        // получаем данные из бд в виде курсора
-                        keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
-                        // определяем, какие столбцы из курсора будут выводиться в ListView
-                        String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
-                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
-                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
-                        keysListView.setAdapter(keysAdapter);
-                        //----------------------------------------------------------- база данных ----------------------------------------------------------
-                    } else {
-                        Toast.makeText(getApplicationContext(),"Ошибка записи базы данных!",Toast.LENGTH_LONG).show();
-                    }
 
                 }
             }

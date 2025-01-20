@@ -31,8 +31,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean InsertKeyString(String key)
-    {
+//    public int checkKeyCursor(String key){
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        ContentValues cv = new ContentValues();
+//    }
+    public boolean InsertKeyString(String key){
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COLUMN_KEY_STRING,key);
