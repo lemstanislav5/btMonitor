@@ -31,7 +31,8 @@
                 android:layout_height="20dp"
                 android:textSize="15dp"
                 android:text="Выбранный ключь"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textColor="#FFEB3B"/>
             <TextView
                 android:id="@+id/selectedKey"
                 android:layout_width="match_parent"
@@ -41,15 +42,14 @@
                 android:gravity="center"/>
 
             <EditText
-                android:id="@+id/editText1"
+                android:id="@+id/editText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:ems="10"
                 android:textSize="20dp"
                 android:hint="Адрес ключа"
-                android:gravity="center"
-                android:focusable="false"/>
+                android:gravity="center"/>
             <Button
                 android:id="@+id/update"
                 android:layout_width="match_parent"
