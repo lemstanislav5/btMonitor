@@ -40,6 +40,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.btapp.adapter.BtConsts;
 import com.example.btapp.bluetooth.BtConnection;
 import com.example.btapp.dbHelper.DatabaseHelper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.Objects;
 
@@ -140,12 +142,17 @@ public class MainActivity extends AppCompatActivity {
         });
         //Отправляем сообщения на устройство
         send.setOnClickListener(view -> {
+            if(!Objects.equals(selectedKey, "")){
+                String data = "[" + selectedKey.replace(':', ',') + "]";
+                btConnection.sendMessage(data);
+            } else {
+                Toast.makeText(getApplicationContext(),"Ключ не выбран!",Toast.LENGTH_SHORT).show();
+            }
             editText.setText("");
-            btConnection.sendMessage("A");
-            Toast.makeText(getApplicationContext(),"Отправка данных!",Toast.LENGTH_SHORT).show();
         });
         delete.setOnClickListener(view -> {
             editText.setText("");
+
             // btConnection.sendMessage("A");
             Toast.makeText(getApplicationContext(),"Ключь удален!",Toast.LENGTH_SHORT).show();
             // Разблокируем поле ввода адреса
