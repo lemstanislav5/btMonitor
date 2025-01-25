@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:textSize="15dp"
-                android:text="Выбранный ключь"
+                android:text="Выбран ключь:"
                 android:gravity="center"
                 android:textColor="#FFEB3B"/>
             <TextView

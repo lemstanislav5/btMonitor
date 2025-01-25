@@ -43,6 +43,7 @@ import com.example.btapp.dbHelper.DatabaseHelper;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
@@ -142,8 +143,15 @@ public class MainActivity extends AppCompatActivity {
         //Отправляем сообщения на устройство
         send.setOnClickListener(view -> {
             if(!Objects.equals(selectedKey, "")){
-                String data = "[" + selectedKey.replace(':', ',') + "]";
-                btConnection.sendMessage(data);
+                String[] data = selectedKey.split(":");
+                int[] arr = new int[8];;
+                for(int i = 0; i < data.length; i++){
+                    arr[i] = Integer.parseInt(data[i], 16);
+                }
+//                String message = Arrays.toString(arr).replaceAll(" ", "");
+                String message = "[" + selectedKey.replace(':', ',') + "]";
+                Log.d("MyLog", "message: " + message);
+                btConnection.sendMessage(message);
             } else {
                 Toast.makeText(getApplicationContext(),"Ключ не выбран!",Toast.LENGTH_SHORT).show();
             }

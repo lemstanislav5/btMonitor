@@ -79,8 +79,12 @@ public class ReceiveThread extends Thread{
                         intent.setAction("MY_ACTION");
                         context.sendBroadcast(intent);
                     }
+                } else if (newKey.equals("#")) {
+                    Log.d("MyLog", "Режим записи болванки!");
+                } else if (newKey.equals("&")) {
+                    Log.d("MyLog", "Запись болванки закончена!");
                 } else {
-                    Log.d("MyLog", "Сотрока не соответствует критериям!");
+                    Log.d("MyLog", "Сотрока не соответствует критериям! ");
                 }
             } catch (IOException err){
                 Log.d("MyLog", "run: " + String.valueOf(err));
