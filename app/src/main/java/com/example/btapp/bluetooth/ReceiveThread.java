@@ -32,9 +32,20 @@ public class ReceiveThread extends Thread{
         this.context = context;
     }
 
+    public  void sendNotification(String filter, String str){
+        Intent intent = new Intent();
+        intent.putExtra("com.example.snippets.DATA", String.valueOf(str));
+        intent.setPackage("com.example.btapp");
+        intent.setAction(filter);
+        context.sendBroadcast(intent);
+    }
+
     @Override
     public void run() {
+        sendNotification("MY_CONNECTION", "opened");
         Log.d("MyLog", "class ReceiveThread run()");
+        //Объявляем поле, которое будет хранить предыдущее время срабатывания
+        long previousSystemTime = System.currentTimeMillis();
         byte[] rBuffer = new byte[40];
         int size;
         String key = "";
@@ -59,36 +70,39 @@ public class ReceiveThread extends Thread{
                         StringBuilder keyToHex = new StringBuilder();
                         try{
                             array = gson.fromJson(key, int[].class);
-                        }catch(JsonSyntaxException e){
-                            Log.d("MyLog", "Сотрока не соответствует формату JSON!");
-                            return;
-                        }
-                        for (int i = 0; i < array.length; i++){
-                            if(i < array.length - 1){
-                                keyToHex.append(Integer.toHexString(array[i])).append(":");
-                            } else {
-                                keyToHex.append(Integer.toHexString(array[i]));
+                            for (int i = 0; i < array.length; i++){
+                                if(i < array.length - 1){
+                                    keyToHex.append(Integer.toHexString(array[i])).append(":");
+                                } else {
+                                    keyToHex.append(Integer.toHexString(array[i]));
+                                }
+
                             }
 
+                            // Отправляем строку в приемник
+                            sendNotification("MY_ACTION", String.valueOf(keyToHex));
+                        }catch(JsonSyntaxException e){
+                            Log.d("MyLog", "Сотрока не соответствует формату JSON!");
                         }
-
-                        // Отправляем строку в приемник
-                        Intent intent = new Intent();
-                        intent.putExtra("com.example.snippets.DATA", String.valueOf(keyToHex));
-                        intent.setPackage("com.example.btapp");
-                        intent.setAction("MY_ACTION");
-                        context.sendBroadcast(intent);
                     }
                 } else if (newKey.equals("#")) {
+                    // Отправляем строку в приемник
+                    sendNotification("MY_NOTIFICATION", String.valueOf("Режим записи болванки!"));
                     Log.d("MyLog", "Режим записи болванки!");
                 } else if (newKey.equals("&")) {
+                    sendNotification("MY_NOTIFICATION", String.valueOf("Запись болванки закончена!"));
                     Log.d("MyLog", "Запись болванки закончена!");
                 } else {
                     Log.d("MyLog", "Сотрока не соответствует критериям! ");
                 }
             } catch (IOException err){
+                sendNotification("MY_CONNECTION", "closed");
                 Log.d("MyLog", "run: " + String.valueOf(err));
                 break;
+            }
+            if((System.currentTimeMillis() - previousSystemTime) > 5000) { // если текущее время минус предыдущее больше 1000 миллисекунд
+                key = ""; // возвращаем исходные данные ключа для возможности повторного чтения
+                previousSystemTime = System.currentTimeMillis(); // и записываем новое значение предыдущего времени
             }
         }
     }
@@ -98,33 +112,6 @@ public class ReceiveThread extends Thread{
             outputStream.write(byteArray);
         } catch (IOException err){
             Log.d("MyLog", "Error sendMessage: " + String.valueOf(err));
-        }
-    }
-    class Test {
-        private static final int sizeOfIntInHalfBytes = 8;
-        private static final int numberOfBitsInAHalfByte = 4;
-        private static final int halfByte = 0x0F;
-        private  final char[] hexDigits = {
-                '0', '1', '2', '3', '4', '5', '6', '7',
-                '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
-        };
-
-        public  String decToHex(int dec) {
-            StringBuilder hexBuilder = new StringBuilder(sizeOfIntInHalfBytes);
-            hexBuilder.setLength(sizeOfIntInHalfBytes);
-            for (int i = sizeOfIntInHalfBytes - 1; i >= 0; --i)
-            {
-                int j = dec & halfByte;
-                hexBuilder.setCharAt(i, hexDigits[j]);
-                dec >>= numberOfBitsInAHalfByte;
-            }
-            return hexBuilder.toString();
-        }
-
-        public  void main(String[] args) {
-            int dec = 305445566;
-            String hex = decToHex(dec);
-            System.out.println(hex);
         }
     }
 }

@@ -26,20 +26,46 @@
                 tools:layout_editor_absoluteX="1dp"
                 tools:layout_editor_absoluteY="1dp"
                 />
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="20dp"
-                android:textSize="15dp"
-                android:text="Выбран ключь:"
-                android:gravity="center"
-                android:textColor="#FFEB3B"/>
-            <TextView
-                android:id="@+id/selectedKey"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                  <TextView
+                      android:layout_width="140dp"
+                      android:layout_height="20dp"
+                      android:textSize="15dp"
+                      android:text="Прочитан ключь:"
+                      android:gravity="center"
+                      android:textColor="#4CAF50"/>
+                  <TextView
+                      android:id="@+id/readKey"
+                      android:layout_width="200dp"
+                      android:layout_height="30dp"
+                      android:textSize="20dp"
+                      android:text="- - - - - - - -"
+                      android:gravity="center"/>
+            </LinearLayout>
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:textSize="20dp"
-                android:text="- - - - - - - -"
-                android:gravity="center"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                  <TextView
+                      android:layout_width="140dp"
+                      android:layout_height="20dp"
+                      android:textSize="15dp"
+                      android:text="Выбран ключь:"
+                      android:gravity="center"
+                      android:textColor="#FFEB3B"/>
+                  <TextView
+                      android:id="@+id/selectedKey"
+                      android:layout_width="200dp"
+                      android:layout_height="30dp"
+                      android:textSize="20dp"
+                      android:text="- - - - - - - -"
+                      android:gravity="center"/>
+            </LinearLayout>
+
+
 
             <EditText
                 android:id="@+id/editText"

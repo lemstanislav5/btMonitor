@@ -56,16 +56,17 @@ public class MainActivity extends AppCompatActivity {
     private Button send, update;
     private ImageButton delete;
     private BroadcastReceiver myBroadcastReceiver;
-    DatabaseHelper databaseHelper;
-    SQLiteDatabase db;
-    Cursor keysCursor;
-    SimpleCursorAdapter keysAdapter;
+    private DatabaseHelper databaseHelper;
+    private SQLiteDatabase db;
+    private Cursor keysCursor;
+    private SimpleCursorAdapter keysAdapter;
     private ListView keysListView;
     private String selectedKey = "";
     private TextView selectedKeyTextView;
     private EditText editText;
-    Cursor selectedKeyCursor;
-    Cursor checkKeyCursor;
+    private Cursor selectedKeyCursor;
+    private Cursor checkKeyCursor;
+    private TextView readKey;
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -84,38 +85,51 @@ public class MainActivity extends AppCompatActivity {
         // Создаем приемник и его фильтры
         IntentFilter filter = new IntentFilter();
         filter.addAction("MY_ACTION");
+        filter.addAction("MY_NOTIFICATION");
+        filter.addAction("MY_CONNECTION");
         myBroadcastReceiver = new BroadcastReceiver(){
             @Override
             public void onReceive(Context context, Intent intent) {
-            if (Objects.equals(intent.getAction(), "MY_ACTION")) {
-                String data = intent.getStringExtra("com.example.snippets.DATA");
-                Log.d("MyLog", "данные: " + data);
-                //----------------------------------------------------------- база данных ----------------------------------------------------------
-                // Создаем экземпляр базы данных
-                databaseHelper = new DatabaseHelper(getApplicationContext());
-                db = databaseHelper.getReadableDatabase();
-                // Проверяем наличие ключа в базе данных
-                checkKeyCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME + " where " + DatabaseHelper.COLUMN_KEY_STRING + "=?", new String [] {data});
-                int count = checkKeyCursor.getCount();
-                if(count == 0){
-                    if(databaseHelper.InsertKeyString(data)){
-                        db = databaseHelper.getReadableDatabase();
-                        // получаем данные из бд в виде курсора
-                        keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
-                        // определяем, какие столбцы из курсора будут выводиться в ListView
-                        String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
-                        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
-                                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
-                        keysListView.setAdapter(keysAdapter);
-                        //----------------------------------------------------------- база данных ----------------------------------------------------------
+                if (Objects.equals(intent.getAction(), "MY_ACTION")) {
+                    String data = intent.getStringExtra("com.example.snippets.DATA");
+                    readKey.setText(data);
+                    Log.d("MyLog", "данные: " + data);
+                    //----------------------------------------------------------- база данных ----------------------------------------------------------
+                    // Создаем экземпляр базы данных
+                    databaseHelper = new DatabaseHelper(getApplicationContext());
+                    db = databaseHelper.getReadableDatabase();
+                    // Проверяем наличие ключа в базе данных
+                    checkKeyCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME + " where " + DatabaseHelper.COLUMN_KEY_STRING + "=?", new String [] {data});
+                    int count = checkKeyCursor.getCount();
+                    if(count == 0){
+                        if(databaseHelper.InsertKeyString(data)){
+                            db = databaseHelper.getReadableDatabase();
+                            // получаем данные из бд в виде курсора
+                            keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
+                            // определяем, какие столбцы из курсора будут выводиться в ListView
+                            String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
+                            keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+                                    keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+                            keysListView.setAdapter(keysAdapter);
+                            //----------------------------------------------------------- база данных ----------------------------------------------------------
+                        } else {
+                            Toast.makeText(getApplicationContext(),"Ошибка записи базы данных!",Toast.LENGTH_LONG).show();
+                        }
                     } else {
-                        Toast.makeText(getApplicationContext(),"Ошибка записи базы данных!",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(),"Ключь уже записан!",Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(getApplicationContext(),"Ключь уже записан!",Toast.LENGTH_LONG).show();
+                    checkKeyCursor.close();
+                } else if (Objects.equals(intent.getAction(), "MY_NOTIFICATION")) {
+                    String notification = intent.getStringExtra("com.example.snippets.DATA");
+                    Toast.makeText(getApplicationContext(),notification,Toast.LENGTH_LONG).show();
+                } else if (Objects.equals(intent.getAction(), "MY_CONNECTION")) {
+                    String notification = intent.getStringExtra("com.example.snippets.DATA");
+                    if(Objects.equals(notification, "opened")){
+                        Toast.makeText(getApplicationContext(),"Соединение установлено!",Toast.LENGTH_LONG).show();
+                    } else if(Objects.equals(notification, "closed")){
+                        Toast.makeText(getApplicationContext(),"Соединение закрыто!",Toast.LENGTH_LONG).show();
+                    }
                 }
-                checkKeyCursor.close();
-            }
             }
         };
         registerReceiver(myBroadcastReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
@@ -126,6 +140,7 @@ public class MainActivity extends AppCompatActivity {
         keysListView = findViewById(R.id.listKeys);
         selectedKeyTextView = findViewById(R.id.selectedKey);
         editText = findViewById(R.id.editText);
+        readKey = findViewById(R.id.readKey);
 
         init();
         //Получаем необходимые разрешения

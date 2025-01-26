@@ -43,6 +43,8 @@
         <receiver android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
+                <action android:name="com.example.btapp.MY_CONNECTION"/>
+                <action android:name="com.example.btapp.MY_NOTIFICATION"/>
                 <action android:name="com.example.btapp.MY_ACTION"/>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
