@@ -45,4 +45,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return result != -1;
 
     }
+    public void update(String address, String key){
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COLUMN_ADDRESS,address);
+        db.update(TABLE_NAME, cv, COLUMN_KEY_STRING +  " = ?", new String[]{key});
+    }
+    public void delete(String key){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, COLUMN_KEY_STRING +  " = ?", new String[]{key});
+    }
 }

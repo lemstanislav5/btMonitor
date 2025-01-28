@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private Cursor selectedKeyCursor;
     private Cursor checkKeyCursor;
     private TextView readKey;
+    private int position;
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -149,36 +150,56 @@ public class MainActivity extends AppCompatActivity {
         update.setOnClickListener(view -> {
             String address = editText.getText().toString();
             editText.setText("");
-            Toast.makeText(getApplicationContext(),"Обновление данных! " + address,Toast.LENGTH_SHORT).show();
-            /*
-            * Остановился здесь
-            * обновление данных адреса ключа
-            * */
+
+            if(!Objects.equals(selectedKey, "")){
+                editText.setText("");
+                databaseHelper = new DatabaseHelper(getApplicationContext());
+                databaseHelper.update(address, selectedKey);
+                updateView(position, address);
+            }
         });
+
         //Отправляем сообщения на устройство
         send.setOnClickListener(view -> {
             if(!Objects.equals(selectedKey, "")){
                 String[] data = selectedKey.split(":");
-                int[] arr = new int[8];;
-                for(int i = 0; i < data.length; i++){
-                    arr[i] = Integer.parseInt(data[i], 16);
-                }
-//                String message = Arrays.toString(arr).replaceAll(" ", "");
                 String message = "[" + selectedKey.replace(':', ',') + "]";
-                Log.d("MyLog", "message: " + message);
                 btConnection.sendMessage(message);
             } else {
                 Toast.makeText(getApplicationContext(),"Ключ не выбран!",Toast.LENGTH_SHORT).show();
             }
             editText.setText("");
         });
+
         delete.setOnClickListener(view -> {
             editText.setText("");
-
-            // btConnection.sendMessage("A");
+            databaseHelper = new DatabaseHelper(getApplicationContext());
+            databaseHelper.delete(selectedKey);
+            deleteView(position);
             Toast.makeText(getApplicationContext(),"Ключь удален!",Toast.LENGTH_SHORT).show();
-            // Разблокируем поле ввода адреса
         });
+    }
+
+    // Функция обновляет поле TextView android.R.id.text2 из ListView
+    private void updateView(int index, String address){
+        View v = keysListView.getChildAt(index - keysListView.getFirstVisiblePosition());
+        if(v == null)
+            return;
+        TextView someText = (TextView) v.findViewById(android.R.id.text2);
+        someText.setText(address);
+    }
+    // Функция обновляет адаптер при удалении элемента
+    private void deleteView(int index){
+        View v = keysListView.getChildAt(index - keysListView.getFirstVisiblePosition());
+        if(v == null)
+            return;
+        keysCursor =  db.rawQuery("select * from "+ DatabaseHelper.TABLE_NAME, null);
+        String[] headers = new String[] {DatabaseHelper.COLUMN_KEY_STRING, DatabaseHelper.COLUMN_ADDRESS};
+        keysAdapter = new SimpleCursorAdapter(getApplicationContext(), android.R.layout.two_line_list_item,
+                keysCursor, headers, new int[]{android.R.id.text1, android.R.id.text2}, 0);
+        keysAdapter.changeCursor(keysCursor);
+        keysListView.setAdapter(keysAdapter);
+
     }
 
     @Override
@@ -202,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
                 String key = keysCursor.getString(1);
                 selectedKey = key;
                 selectedKeyTextView.setText(selectedKey);
+                position = i;
 
                 databaseHelper = new DatabaseHelper(getApplicationContext());
                 db = databaseHelper.getReadableDatabase();
