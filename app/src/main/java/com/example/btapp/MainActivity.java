@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private Cursor checkKeyCursor;
     private TextView readKey;
     private int position;
+    private boolean isConnected = false;
+
+    private boolean isDeviceSelected = false;
 
     @SuppressLint({"WrongViewCast", "MissingInflatedId"})
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
@@ -126,8 +130,10 @@ public class MainActivity extends AppCompatActivity {
                 } else if (Objects.equals(intent.getAction(), "MY_CONNECTION")) {
                     String notification = intent.getStringExtra("com.example.snippets.DATA");
                     if(Objects.equals(notification, "opened")){
+                        isConnected = true;
                         Toast.makeText(getApplicationContext(),"Соединение установлено!",Toast.LENGTH_LONG).show();
                     } else if(Objects.equals(notification, "closed")){
+                        isConnected = false;
                         Toast.makeText(getApplicationContext(),"Соединение закрыто!",Toast.LENGTH_LONG).show();
                     }
                 }
@@ -161,14 +167,19 @@ public class MainActivity extends AppCompatActivity {
 
         //Отправляем сообщения на устройство
         send.setOnClickListener(view -> {
-            if(!Objects.equals(selectedKey, "")){
-                String[] data = selectedKey.split(":");
-                String message = "[" + selectedKey.replace(':', ',') + "]";
-                btConnection.sendMessage(message);
+            if(isConnected){
+                if(!Objects.equals(selectedKey, "")){
+                    String[] data = selectedKey.split(":");
+                    String message = "[" + selectedKey.replace(':', ',') + "]";
+                    btConnection.sendMessage(message);
+                } else {
+                    Toast.makeText(getApplicationContext(),"Ключ не выбран!",Toast.LENGTH_SHORT).show();
+                }
+                editText.setText("");
             } else {
-                Toast.makeText(getApplicationContext(),"Ключ не выбран!",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(),"Устройство не подключено!",Toast.LENGTH_SHORT).show();
             }
-            editText.setText("");
+
         });
 
         delete.setOnClickListener(view -> {
@@ -187,6 +198,8 @@ public class MainActivity extends AppCompatActivity {
             return;
         TextView someText = (TextView) v.findViewById(android.R.id.text2);
         someText.setText(address);
+        // Меняем цвет измененного текста
+        someText.setTextColor(Color.parseColor("#0F9D58"));
     }
     // Функция обновляет адаптер при удалении элемента
     private void deleteView(int index){
@@ -235,18 +248,6 @@ public class MainActivity extends AppCompatActivity {
                             str = "";
                             for (String cn : selectedKeyCursor.getColumnNames()) {
                                 str = str.concat(cn + " = " + selectedKeyCursor.getString(selectedKeyCursor.getColumnIndex(cn)) + "; ");
-                                /**
-                                 * Остановился здесь
-                                 * После выбора id мы активизируем кнопки удалить, отправить, редактировать
-                                 * и поле редактирования адреса метки
-                                 * далее прописываем соответствующую логику
-                                 * ВЫВОД:
-                                 * _id = 1; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
-                                 * _id = 4; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
-                                 * _id = 7; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
-                                 * _id = 9; keyString = 1:54:d7:db:1:0:0:fe; address = не задано;
-                                 * ПРИ ВНЕСЕНИИ ДАННЫХ В БАЗУ ДАННЫХ НУЖНО РЕАЛИЗОВАТЬ ПРОВЕРКУ НА ПОВТОРЕНИЕ, ЧТО МОЖНО СДЕЛАТЬ ЕСЛИ ПРИ ВЫБЛОРКЕ КУРСОР БУДЕТ NULL
-                                 */
                             }
                             Log.d("MyLog", str);
                         } while (selectedKeyCursor.moveToNext());
@@ -261,6 +262,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //----------------------------------------------------------- база данных ----------------------------------------------------------
+        init();
     }
 
     @Override
@@ -289,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if(requestCode == BT_REQUEST_PERM){
             if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
-                Toast.makeText(this, "Получены разрешения: *LOCATION & *BLUETOOTH", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Получены разрешения: *LOCATION & *BLUETOOTH.", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "Разрешения не предоставлены! Приложение остановлено!", Toast.LENGTH_LONG).show();
                 finish();
@@ -318,7 +320,12 @@ public class MainActivity extends AppCompatActivity {
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         pref = getSharedPreferences(BtConsts.MY_PREF, Context.MODE_PRIVATE);
         btConnection = new BtConnection(this);
-        Log.d("MyLog", "Bt MAC " + pref.getString(BtConsts.MAC_KEY, "no bt selected"));
+        if(!pref.getString(BtConsts.MAC_KEY, "").isEmpty()){
+            isDeviceSelected = true;
+        } else {
+            isDeviceSelected = false;
+        }
+        Log.d("MyLog", "Bt MAC " + pref.getString(BtConsts.MAC_KEY, ""));
     }
 
     @Override
@@ -326,11 +333,11 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == R.id.id_bt_button){
             if(!btAdapter.isEnabled()){
-                Toast.makeText(this, "Bluetooth выключен", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bluetooth выключен.", Toast.LENGTH_SHORT).show();
                 enableBt();
             } else {
                 // Если bluetooth включен записываем данные в массив
-                Toast.makeText(this, "Bluetooth включен", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bluetooth включен.", Toast.LENGTH_SHORT).show();
                 menuItem.setIcon(R.drawable.baseline_bluetooth_enable_24);
             }
         } else if(item.getItemId() == R.id.id_bt_menu){
@@ -338,12 +345,17 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, BtListActivity.class);
                 startActivity(intent);
             } else {
-                Toast.makeText(this, "Bluetooth выключен", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Bluetooth выключен.", Toast.LENGTH_SHORT).show();
             }
 
         }else if(item.getItemId() == R.id.id_connect){
-            btConnection.connect();
-            Toast.makeText(this, "Подключаемся к устройству", Toast.LENGTH_SHORT).show();
+            if(isDeviceSelected){
+                btConnection.connect();
+                Toast.makeText(this, "Подключаемся к устройству.", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Устройство не выбрано!", Toast.LENGTH_SHORT).show();
+            }
+
         }
         return super.onOptionsItemSelected(item);
     }
